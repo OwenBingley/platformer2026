@@ -55,7 +55,7 @@ public class Level {
 		restartLevel();
 	}
 
-	public LevelData getLevelData(){
+	public LevelData getLevelData() {
 		return leveldata;
 	}
 
@@ -89,7 +89,8 @@ public class Level {
 				else if (values[x][y] == 7)
 					tiles[x][y] = new SolidTile(xPosition, yPosition, tileSize, tileset.getImage("Grass"), this);
 				else if (values[x][y] == 8)
-					enemiesList.add(new Enemy(xPosition*tileSize, yPosition*tileSize, this)); // TODO: objects vs tiles
+					enemiesList.add(new Enemy(xPosition * tileSize, yPosition * tileSize, this)); // TODO: objects vs
+																									// tiles
 				else if (values[x][y] == 9)
 					tiles[x][y] = new Flag(xPosition, yPosition, tileSize, tileset.getImage("Flag"), this);
 				else if (values[x][y] == 10) {
@@ -167,10 +168,11 @@ public class Level {
 
 			for (int i = 0; i < flowers.size(); i++) {
 				if (flowers.get(i).getHitbox().isIntersecting(player.getHitbox())) {
-					if(flowers.get(i).getType() == 1)
+					if (flowers.get(i).getType() == 1)
 						water(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 3);
-//					else
-//						addGas(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 20, new ArrayList<Gas>());
+					// else
+					// addGas(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 20, new
+					// ArrayList<Gas>());
 					flowers.remove(i);
 					i--;
 				}
@@ -191,130 +193,121 @@ public class Level {
 			camera.update(tslf);
 		}
 	}
-	
-	
-	//#############################################################################################################
-	//Your code goes here! 
-	//Please make sure you read the rubric/directions carefully and implement the solution recursively!
+
+	// #############################################################################################################
+	// Your code goes here!
+	// Please make sure you read the rubric/directions carefully and implement the
+	// solution recursively!
 	private void water(int col, int row, Map map, int fullness) {
-		
-if(col < 0 || row < 0 || col >= map.getTiles().length || row >= map.getTiles()[0].length) {
-return;
-}
 
-if(map.getTiles()[col][row] != null && map.getTiles()[col][row].isSolid()) {
-return;
-}
+		if (col < 0 || row < 0 || col >= map.getTiles().length || row >= map.getTiles()[0].length) {
 
-if(map.getTiles()[col][row] instanceof Water) {
-return;
-}
+			return;
 
-String image = "";
+		}
 
-if(fullness == 3) {
-image = "Full_water";
-}
-else if(fullness == 2) {
-image = "Half_water";
-}
-else if(fullness == 1) {
-image = "Quarter_water";
-}
-else {
-image = "Falling_water";
-}
+		if (map.getTiles()[col][row] != null && map.getTiles()[col][row].isSolid()) {
 
-   
-Water w = new Water(col,row,tileSize,tileset.getImage(image),this,fullness);
-	
-map.addTile(col, row, w);
+			return;
 
-   
+		}
 
-if(row + 1 < map.getTiles()[0].length) {
+		if (map.getTiles()[col][row] instanceof Water) {
 
-Tile below = map.getTiles()[col][row + 1];
+			return;
 
-if(below == null || !below.isSolid()) {
+		}
 
-water(col, row + 1, map, 0);
-return;
-}
-}
+		String image = "";
 
-  
+		if (fullness == 3) {
 
-int nextFullness = fullness;
+			image = "Full_water";
+		}
 
-    
-if(fullness == 3) {
-nextFullness = 2;
-}
+		else if (fullness == 2) {
 
-else if(fullness == 2) {
-nextFullness = 1;
-}
+			image = "Half_water";
 
-else if(fullness == 1) {
-nextFullness = 1;
-}
+		}
 
-else if(fullness == 0) {
-nextFullness = 3;
-}
+		else if (fullness == 1) {
+			image = "Quarter_water";
+		} else {
+			image = "Falling_water";
+		}
 
-if(col + 1 < map.getTiles().length && !(map.getTiles()[col + 1][row] instanceof Water)) {
+		Water w = new Water(col, row, tileSize, tileset.getImage(image), this, fullness);
 
-Tile right = map.getTiles()[col + 1][row];
+		map.addTile(col, row, w);
 
-if(right == null || !right.isSolid()) {
+		if (row + 1 < map.getTiles()[0].length) {
 
-if(row + 1 < map.getTiles()[0].length) {
+			Tile below = map.getTiles()[col][row + 1];
 
-Tile belowRight = map.getTiles()[col + 1][row + 1];
+			if (below == null || !below.isSolid()) {
 
-if(belowRight == null || !belowRight.isSolid()) {
-water(col + 1, row, map, 0);
-}
-else {
-water(col + 1, row, map, nextFullness);
-}
-}
-}
-}
+				water(col, row + 1, map, 0);
+				return;
+			}
+		}
 
-    
+		int nextFullness = fullness;
 
-if(col - 1 >= 0 && !(map.getTiles()[col - 1][row] instanceof Water)) {
+		if (fullness == 3) {
+			nextFullness = 2;
+		}
 
-Tile left = map.getTiles()[col - 1][row];
+		else if (fullness == 2) {
+			nextFullness = 1;
+		}
 
-if(left == null || !left.isSolid()) {
+		else if (fullness == 1) {
+			nextFullness = 1;
+		}
 
-if(row + 1 < map.getTiles()[0].length) {
+		else if (fullness == 0) {
+			nextFullness = 3;
+		}
+        
+		if (col + 1 < map.getTiles().length && !(map.getTiles()[col + 1][row] instanceof Water)) {
 
-Tile belowLeft = map.getTiles()[col - 1][row + 1];
+			Tile right = map.getTiles()[col + 1][row];
 
-if(belowLeft == null || !belowLeft.isSolid()) {
-water(col - 1, row, map, 0);
-}
-else {
-water(col - 1, row, map, nextFullness);
-}
-}
-}
-}
-}
-	
-	
-	
-	
-	
-	
-	
+			if (right == null || !right.isSolid()) {
 
+				if (row + 1 < map.getTiles()[0].length) {
 
+					Tile belowRight = map.getTiles()[col + 1][row + 1];
+
+					if (belowRight == null || !belowRight.isSolid()) {
+						water(col + 1, row, map, 0);
+					} else {
+						water(col + 1, row, map, nextFullness);
+					}
+				}
+			}
+		}
+
+		if (col - 1 >= 0 && !(map.getTiles()[col - 1][row] instanceof Water)) {
+
+			Tile left = map.getTiles()[col - 1][row];
+
+			if (left == null || !left.isSolid()) {
+
+				if (row + 1 < map.getTiles()[0].length) {
+
+					Tile belowLeft = map.getTiles()[col - 1][row + 1];
+
+					if (belowLeft == null || !belowLeft.isSolid()) {
+						water(col - 1, row, map, 0);
+					} else {
+						water(col - 1, row, map, nextFullness);
+					}
+				}
+			}
+		}
+	}
 
 	public void draw(Graphics g) {
 		g.translate((int) -camera.getX(), (int) -camera.getY());
