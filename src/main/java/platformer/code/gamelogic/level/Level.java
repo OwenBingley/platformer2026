@@ -201,13 +201,15 @@ public class Level {
 	// #############################################################################################################
 
 private void water(int col, int row, Map map, int fullness) {
-    if (col < 0 || col >= map.getTiles().length || row < 0 || row >= map.getTiles()[col].length) {
+    
+	// Check if the position is out of bounds
+	if (col < 0 || col >= map.getTiles().length || row < 0 || row >= map.getTiles()[col].length) {
         return;
     }
-
+    // Check if the tile is solid and cannot be replaced by water
     Tile currentTile = map.getTiles()[col][row];
 
-    
+    // If the tile is solid and not a flower water cant be placed
     if (currentTile != null && currentTile.isSolid() && !(currentTile instanceof Flower)) {
         return;
 		
@@ -234,26 +236,25 @@ private void water(int col, int row, Map map, int fullness) {
     }
     
     
-	
+	// Places the water tile
     Water w = new Water(col, row, tileSize, tileset.getImage(imageName), this, fullness);
     map.addTile(col, row, w);
 
-  
+  // Trys yo flow downwards first
     int nextRow = row + 1;
     boolean canFlowDown = false;
 
-    
+  // Checks if the tile below is solid or not  
     if (nextRow < map.getTiles()[col].length) {
         Tile tileBelow = map.getTiles()[col][nextRow];
         if (!tileBelow.isSolid()) {
             canFlowDown = true;
         }
-    }
-	else{
+    }else{ // if previous statment returns false because of out of bounds,	` we return so we can still flow down
 		return;
 		
 	}
-
+    // if it can flow down, it does it and returns so it doesnt flow left and right
     if (canFlowDown) {
         
         int floorRow = nextRow + 1;
