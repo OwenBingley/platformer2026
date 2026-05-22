@@ -198,117 +198,377 @@ public class Level {
 	// Your code goes here!
 	// Please make sure you read the rubric/directions carefully and implement the
 	// solution recursively!
-	private void water(int col, int row, Map map, int fullness) {
+	// #############################################################################################################
+// Recursive water spreading
 
-		if (col < 0 || row < 0 || col >= map.getTiles().length || row >= map.getTiles()[0].length) {
+             // Recursive water function
+// col = x position
+// row = y position
+// fullness:
+// 3 = full
+// 2 = half
+// 1 = quarter
+// 0 = falling
 
-			return;
+private void water(int col, int row, Map map, int fullness) {
 
-		}
+    // =========================
+    // STOP INDEX ERRORS
+    // =========================
+    if(col < 0 || row < 0 ||
+       col >= map.getTiles().length ||
+       row >= map.getTiles()[0].length) {
 
-		if (map.getTiles()[col][row] != null && map.getTiles()[col][row].isSolid()) {
+        return;
+    }
 
-			return;
 
-		}
 
-		if (map.getTiles()[col][row] instanceof Water) {
+    // =========================
+    // STOP SOLID BLOCKS
+    // =========================
+    if(map.getTiles()[col][row] != null &&
+       map.getTiles()[col][row].isSolid()) {
 
-			return;
+        return;
+    }
 
-		}
 
-		String image = "";
 
-		if (fullness == 3) {
+    // =========================
+    // IF WATER ALREADY EXISTS
+    // =========================
+    // if new water touches old water
+    // turn into full water
+    if(map.getTiles()[col][row] instanceof Water) {
 
-			image = "Full_water";
-		}
+        Water fullWater = new Water(
+            col,
+            row,
+            tileSize,
+            tileset.getImage("Full_water"),
+            this,
+            3
+        );
 
-		else if (fullness == 2) {
+        map.addTile(col, row, fullWater);
 
-			image = "Half_water";
+        return;
+    }
 
-		}
 
-		else if (fullness == 1) {
-			image = "Quarter_water";
-		} else {
-			image = "Falling_water";
-		}
 
-		Water w = new Water(col, row, tileSize, tileset.getImage(image), this, fullness);
+    // =========================
+    // PICK IMAGE
+    // =========================
+    String image = "";
 
-		map.addTile(col, row, w);
+    if(fullness == 3) {
+        image = "Full_water";
+    }
 
-		if (row + 1 < map.getTiles()[0].length) {
+    else if(fullness == 2) {
+        image = "Half_water";
+    }
 
-			Tile below = map.getTiles()[col][row + 1];
+    else if(fullness == 1) {
+        image = "Quarter_water";
+    }
 
-			if (below == null || !below.isSolid()) {
+    else {
+        image = "Falling_water";
+    }
 
-				water(col, row + 1, map, 0);
-				return;
-			}
-		}
 
-		int nextFullness = fullness;
 
-		if (fullness == 3) {
-			nextFullness = 2;
-		}
+    // =========================
+    // PLACE WATER
+    // =========================
+    Water w = new Water(
+        col,
+        row,
+        tileSize,
+        tileset.getImage(image),
+        this,
+        fullness
+    );
 
-		else if (fullness == 2) {
-			nextFullness = 1;
-		}
+    map.addTile(col, row, w);
 
-		else if (fullness == 1) {
-			nextFullness = 1;
-		}
 
-		else if (fullness == 0) {
-			nextFullness = 3;
-		}
-        
-		if (col + 1 < map.getTiles().length && !(map.getTiles()[col + 1][row] instanceof Water)) {
 
-			Tile right = map.getTiles()[col + 1][row];
+    // =========================
+    // CHECK BELOW
+    // =========================
+    boolean canGoDown = false;
 
-			if (right == null || !right.isSolid()) {
+    if(row + 1 < map.getTiles()[0].length) {
 
-				if (row + 1 < map.getTiles()[0].length) {
+        Tile below = map.getTiles()[col][row + 1];
 
-					Tile belowRight = map.getTiles()[col + 1][row + 1];
+        if(below == null || !below.isSolid()) {
+            canGoDown = true;
+        }
+    }
 
-					if (belowRight == null || !belowRight.isSolid()) {
-						water(col + 1, row, map, 0);
-					} else {
-						water(col + 1, row, map, nextFullness);
-					}
-				}
-			}
-		}
 
-		if (col - 1 >= 0 && !(map.getTiles()[col - 1][row] instanceof Water)) {
 
-			Tile left = map.getTiles()[col - 1][row];
+    // =========================
+    // WATER FALLS DOWN
+    // =========================
+    if(canGoDown) {
 
-			if (left == null || !left.isSolid()) {
+        // check if this is only a 1 block drop
+        boolean oneBlockDrop = false;
 
-				if (row + 1 < map.getTiles()[0].length) {
+        if(row + 2 < map.getTiles()[0].length) {
 
-					Tile belowLeft = map.getTiles()[col - 1][row + 1];
+            Tile twoDown = map.getTiles()[col][row + 2];
 
-					if (belowLeft == null || !belowLeft.isSolid()) {
-						water(col - 1, row, map, 0);
-					} else {
-						water(col - 1, row, map, nextFullness);
-					}
-				}
-			}
-		}
-	}
+            if(twoDown != null && twoDown.isSolid()) {
+                oneBlockDrop = true;
+            }
+        }
 
+
+
+        // =========================
+        // SMALL DROP
+        // no falling water
+        // =========================
+        if(oneBlockDrop) {
+
+            int nextFullness = fullness;
+
+            if(fullness == 3) {
+                nextFullness = 2;
+            }
+
+            else if(fullness == 2) {
+                nextFullness = 1;
+            }
+
+            else if(fullness == 1) {
+                nextFullness = 1;
+            }
+
+            water(col, row + 1, map, nextFullness);
+
+            return;
+        }
+
+
+
+        // =========================
+        // REAL FALL
+        // =========================
+        water(col, row + 1, map, 0);
+
+
+
+        // =========================
+        // WATER ABOVE FALL
+        // =========================
+        // next water goes above
+        // falling water
+
+        if(fullness > 0 && row - 1 >= 0) {
+
+            int nextAbove = fullness;
+
+            if(fullness == 3) {
+                nextAbove = 2;
+            }
+
+            else if(fullness == 2) {
+                nextAbove = 1;
+            }
+
+            else if(fullness == 1) {
+                nextAbove = 1;
+            }
+
+            Tile above = map.getTiles()[col][row - 1];
+
+            if(!(above instanceof Water)) {
+
+                water(col, row - 1, map, nextAbove);
+
+            }
+        }
+
+        return;
+    }
+
+
+
+    // =========================
+    // FALLING WATER HITS GROUND
+    // BECOMES FULL WATER
+    // =========================
+    if(fullness == 0) {
+
+        Water full = new Water(
+            col,
+            row,
+            tileSize,
+            tileset.getImage("Full_water"),
+            this,
+            3
+        );
+
+        map.addTile(col, row, full);
+
+        fullness = 3;
+    }
+
+
+
+    // =========================
+    // NEXT WATER STRENGTH
+    // =========================
+    int nextFullness = fullness;
+
+    if(fullness == 3) {
+        nextFullness = 2;
+    }
+
+    else if(fullness == 2) {
+        nextFullness = 1;
+    }
+
+    else if(fullness == 1) {
+        nextFullness = 1;
+    }
+
+
+
+    // =========================
+    // FLOW RIGHT
+    // =========================
+    if(col + 1 < map.getTiles().length) {
+
+        Tile right = map.getTiles()[col + 1][row];
+
+        if(right == null || !right.isSolid()) {
+
+            boolean rightCanFall = false;
+
+            if(row + 1 < map.getTiles()[0].length) {
+
+                Tile belowRight = map.getTiles()[col + 1][row + 1];
+
+                if(belowRight == null || !belowRight.isSolid()) {
+                    rightCanFall = true;
+                }
+            }
+
+
+
+            // edge -> falling water
+            if(rightCanFall) {
+
+                // only use falling water
+                // if more than 1 block down
+
+                boolean bigDrop = false;
+
+                if(row + 2 < map.getTiles()[0].length) {
+
+                    Tile twoDownRight =
+                        map.getTiles()[col + 1][row + 2];
+
+                    if(twoDownRight == null ||
+                       !twoDownRight.isSolid()) {
+
+                        bigDrop = true;
+                    }
+                }
+
+                if(bigDrop) {
+                    water(col + 1, row, map, 0);
+                }
+
+                else {
+                    water(col + 1, row + 1, map, nextFullness);
+                }
+            }
+
+            else {
+                water(col + 1, row, map, nextFullness);
+            }
+        }
+    }
+
+
+
+    // =========================
+    // FLOW LEFT
+    // =========================
+    if(col - 1 >= 0) {
+
+        Tile left = map.getTiles()[col - 1][row];
+
+        if(left == null || !left.isSolid()) {
+
+            boolean leftCanFall = false;
+
+            if(row + 1 < map.getTiles()[0].length) {
+
+                Tile belowLeft = map.getTiles()[col - 1][row + 1];
+
+                if(belowLeft == null || !belowLeft.isSolid()) {
+                    leftCanFall = true;
+                }
+            }
+
+
+
+            // edge -> falling water
+            if(leftCanFall) {
+
+                // only use falling water
+                // if more than 1 block down
+
+                boolean bigDrop = false;
+
+                if(row + 2 < map.getTiles()[0].length) {
+
+                    Tile twoDownLeft =
+                        map.getTiles()[col - 1][row + 2];
+
+                    if(twoDownLeft == null ||
+                       !twoDownLeft.isSolid()) {
+
+                        bigDrop = true;
+                    }
+                }
+
+                if(bigDrop) {
+                    water(col - 1, row, map, 0);
+                }
+
+                else {
+                    water(col - 1, row + 1, map, nextFullness);
+                }
+            }
+
+            else {
+                water(col - 1, row, map, nextFullness);
+            }
+        }
+    }
+}
+
+ 
+	
+	
+	
+	
+	
+	
+	
+	// end of water 
 	public void draw(Graphics g) {
 		g.translate((int) -camera.getX(), (int) -camera.getY());
 
