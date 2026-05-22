@@ -200,8 +200,6 @@ public class Level {
 	// solution recursively!
 	// #############################################################################################################
 
-
-
 private void water(int col, int row, Map map, int fullness) {
     if (col < 0 || col >= map.getTiles().length || row < 0 || row >= map.getTiles()[col].length) {
         return;
@@ -212,17 +210,18 @@ private void water(int col, int row, Map map, int fullness) {
     
     if (currentTile != null && currentTile.isSolid() && !(currentTile instanceof Flower)) {
         return;
+		
     }
-
-    
+   
+    // If the tile is already water, check if we need to change its fullness
     if (currentTile instanceof Water) {
         Water existingWater = (Water) currentTile;
         if (existingWater.getFullness() >= fullness) {
             return; 
         }
     }
-
    
+   // Determine the image based on fullness
     String imageName;
     if (fullness == 3) {
         imageName = "Full_water";
@@ -233,8 +232,9 @@ private void water(int col, int row, Map map, int fullness) {
     } else {
         imageName = "Falling_water"; 
     }
-
     
+    
+	
     Water w = new Water(col, row, tileSize, tileset.getImage(imageName), this, fullness);
     map.addTile(col, row, w);
 
@@ -245,17 +245,23 @@ private void water(int col, int row, Map map, int fullness) {
     
     if (nextRow < map.getTiles()[col].length) {
         Tile tileBelow = map.getTiles()[col][nextRow];
-        if (tileBelow == null || !tileBelow.isSolid()) {
+        if (!tileBelow.isSolid()) {
             canFlowDown = true;
         }
     }
+	else{
+		return;
+		
+	}
 
     if (canFlowDown) {
         
         int floorRow = nextRow + 1;
         int nextFullness = 0; 
-
-        if (floorRow < map.getTiles()[col].length) {
+        
+        
+       
+	    if (floorRow < map.getTiles()[col].length) {
             Tile floorTile = map.getTiles()[col][floorRow];
             if (floorTile != null && floorTile.isSolid()) {
                 nextFullness = 3; 
@@ -269,9 +275,9 @@ private void water(int col, int row, Map map, int fullness) {
         return; 
     }
     
-    
     int hFullness;
-    if (fullness == 3) {
+    
+	if (fullness == 3) {
        hFullness = 2; 
     } else if (fullness == 2) {
        hFullness = 1; 
@@ -289,15 +295,11 @@ private void water(int col, int row, Map map, int fullness) {
         water(leftCol, row, map, hFullness);
     }
 }
+// end of water 
+	
+	
 
-	
-	
-	
-	
-	
-	
-	// end of water 
-	public void draw(Graphics g) {
+public void draw(Graphics g) {
 		g.translate((int) -camera.getX(), (int) -camera.getY());
 
 		// Draw the map
