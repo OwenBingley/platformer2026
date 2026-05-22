@@ -199,22 +199,11 @@ public class Level {
 	// Please make sure you read the rubric/directions carefully and implement the
 	// solution recursively!
 	// #############################################################################################################
-// Recursive water spreading
 
-             // Recursive water function
-// col = x position
-// row = y position
-// fullness:
-// 3 = full
-// 2 = half
-// 1 = quarter
-// 0 = falling
 
 private void water(int col, int row, Map map, int fullness) {
 
-    // =========================
-    // STOP INDEX ERRORS
-    // =========================
+   
     if(col < 0 || row < 0 ||
        col >= map.getTiles().length ||
        row >= map.getTiles()[0].length) {
@@ -224,9 +213,7 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-    // =========================
-    // STOP SOLID BLOCKS
-    // =========================
+   // stops if  solid block
     if(map.getTiles()[col][row] != null &&
        map.getTiles()[col][row].isSolid()) {
 
@@ -235,11 +222,7 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-    // =========================
-    // IF WATER ALREADY EXISTS
-    // =========================
-    // if new water touches old water
-    // turn into full water
+    // turns water into full water
     if(map.getTiles()[col][row] instanceof Water) {
 
         Water fullWater = new Water(
@@ -258,9 +241,7 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-    // =========================
     // PICK IMAGE
-    // =========================
     String image = "";
 
     if(fullness == 3) {
@@ -281,25 +262,16 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-    // =========================
-    // PLACE WATER
-    // =========================
-    Water w = new Water(
-        col,
-        row,
-        tileSize,
-        tileset.getImage(image),
-        this,
-        fullness
-    );
+   
+    // place water
+    
+    Water w = new Water(col,row,tileSize,tileset.getImage(image),this,fullness);
 
-    map.addTile(col, row, w);
+    map.addTile(col , row , w);
 
 
 
-    // =========================
-    // CHECK BELOW
-    // =========================
+    // checks below
     boolean canGoDown = false;
 
     if(row + 1 < map.getTiles()[0].length) {
@@ -313,9 +285,7 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-    // =========================
-    // WATER FALLS DOWN
-    // =========================
+   // water falls down
     if(canGoDown) {
 
         // check if this is only a 1 block drop
@@ -332,10 +302,7 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-        // =========================
-        // SMALL DROP
-        // no falling water
-        // =========================
+        // if drop is small their is no point for falling water
         if(oneBlockDrop) {
 
             int nextFullness = fullness;
@@ -351,7 +318,7 @@ private void water(int col, int row, Map map, int fullness) {
             else if(fullness == 1) {
                 nextFullness = 1;
             }
-
+            
             water(col, row + 1, map, nextFullness);
 
             return;
@@ -359,18 +326,12 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-        // =========================
-        // REAL FALL
-        // =========================
+        // fall
         water(col, row + 1, map, 0);
 
 
 
-        // =========================
-        // WATER ABOVE FALL
-        // =========================
-        // next water goes above
-        // falling water
+        //water goes above falling water
 
         if(fullness > 0 && row - 1 >= 0) {
 
@@ -401,32 +362,20 @@ private void water(int col, int row, Map map, int fullness) {
     }
 
 
-
-    // =========================
-    // FALLING WATER HITS GROUND
-    // BECOMES FULL WATER
-    // =========================
+    // works
+    // falling water hits ground, it turns into full water
     if(fullness == 0) {
 
-        Water full = new Water(
-            col,
-            row,
-            tileSize,
-            tileset.getImage("Full_water"),
-            this,
-            3
-        );
+        Water full = new Water(col,row,tileSize,tileset.getImage("Full_water"),this,3);
 
         map.addTile(col, row, full);
 
-        fullness = 3;
-    }
+       fullness = 3;
+   }
 
 
 
-    // =========================
-    // NEXT WATER STRENGTH
-    // =========================
+ 
     int nextFullness = fullness;
 
     if(fullness == 3) {
@@ -443,9 +392,9 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-    // =========================
+    
     // FLOW RIGHT
-    // =========================
+
     if(col + 1 < map.getTiles().length) {
 
         Tile right = map.getTiles()[col + 1][row];
@@ -465,11 +414,9 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-            // edge -> falling water
             if(rightCanFall) {
 
-                // only use falling water
-                // if more than 1 block down
+               
 
                 boolean bigDrop = false;
 
@@ -502,9 +449,9 @@ private void water(int col, int row, Map map, int fullness) {
 
 
 
-    // =========================
+   
     // FLOW LEFT
-    // =========================
+    
     if(col - 1 >= 0) {
 
         Tile left = map.getTiles()[col - 1][row];
