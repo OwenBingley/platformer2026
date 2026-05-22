@@ -210,7 +210,7 @@ private void water(int col, int row, Map map, int fullness) {
     Tile currentTile = map.getTiles()[col][row];
 
     
-    if (currentTile != null && currentTile.isSolid()) {
+    if (currentTile != null && currentTile.isSolid() && !(currentTile instanceof Flower)) {
         return;
     }
 
@@ -268,7 +268,7 @@ private void water(int col, int row, Map map, int fullness) {
         
         return; 
     }
-
+    
     
     int hFullness;
     if (fullness == 3) {
