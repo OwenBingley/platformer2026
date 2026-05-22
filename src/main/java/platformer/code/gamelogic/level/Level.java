@@ -201,30 +201,28 @@ public class Level {
 	// #############################################################################################################
 
 
-/**
- * Recursively propagates water through the game map based on fluid dynamics rules.
- * * Preconditions: 
- * - col and row must be within the bounds of the map's 2D tile array.
- * - map must be a valid, non-null Map object.
- * - fullness must be an integer between 0 and 3 inclusive:
- * 3: Full_water, 2: Half_water, 1: Quarter_water, 0: Falling_water.
- * * Postconditions:
- * - Updates the map tile at (col, row) with the appropriate Water object.
- * - Recursively triggers water propagation downwards if open air/non-solid exists below.
- * - Alternately, triggers lateral (left/right) propagation if downward path is blocked by a solid.
- */
+
 private void water(int col, int row, Map map, int fullness) {
-    // 1. Boundary Protection: Ensure we don't look or write out of the map borders
     if (col < 0 || col >= map.getTiles().length || row < 0 || row >= map.getTiles()[col].length) {
         return;
     }
 
-    // 2. Solid Collision: Water cannot replace or flow through solid ground
-    if (map.getTiles()[col][row] != null && map.getTiles()[col][row].isSolid()) {
+    Tile currentTile = map.getTiles()[col][row];
+
+    
+    if (currentTile != null && currentTile.isSolid()) {
         return;
     }
 
-    // 3. Image Selection: Map fullness value to the correct string asset name
+    
+    if (currentTile instanceof Water) {
+        Water existingWater = (Water) currentTile;
+        if (existingWater.getFullness() >= fullness) {
+            return; 
+        }
+    }
+
+   
     String imageName;
     if (fullness == 3) {
         imageName = "Full_water";
@@ -233,82 +231,62 @@ private void water(int col, int row, Map map, int fullness) {
     } else if (fullness == 1) {
         imageName = "Quarter_water";
     } else {
-        imageName = "Falling_water"; // fullness == 0
+        imageName = "Falling_water"; 
     }
 
-    // 4. Create and commit the Water tile instance to the 2D column-major array
+    
     Water w = new Water(col, row, tileSize, tileset.getImage(imageName), this, fullness);
     map.addTile(col, row, w);
 
-    // 5. Downward Flow Logic
+  
     int nextRow = row + 1;
     boolean canFlowDown = false;
 
-    // Check if the tile directly beneath exists and is not solid
+    
     if (nextRow < map.getTiles()[col].length) {
-        var tileBelow = map.getTiles()[col][nextRow];
+        Tile tileBelow = map.getTiles()[col][nextRow];
         if (tileBelow == null || !tileBelow.isSolid()) {
             canFlowDown = true;
         }
     }
 
     if (canFlowDown) {
-        // Rule 2 & 5: Reaches flat platform -> becomes Full_water (3), otherwise turns into Falling_water (0)
-        // Check if the tile *below* the falling destination is solid to determine if it's hitting a platform.
+        
         int floorRow = nextRow + 1;
-        int nextFullness = 0; // Default to falling water
+        int nextFullness = 0; 
 
         if (floorRow < map.getTiles()[col].length) {
-            var floorTile = map.getTiles()[col][floorRow];
+            Tile floorTile = map.getTiles()[col][floorRow];
             if (floorTile != null && floorTile.isSolid()) {
-                nextFullness = 3; // Becomes a full block upon impact with a flat platform
+                nextFullness = 3; 
             }
         }
 
-        // Only recurse downwards if that position isn't already filled with identical water to prevent endless loops
-        if (!(map.getTiles()[col][nextRow] instanceof Water && ((Water) map.getTiles()[col][nextRow]).getFullness() == nextFullness)) {
-            water(col, nextRow, map, nextFullness);
-        }
+       
+        water(col, nextRow, map, nextFullness);
         
-        // Rule 5 Note: If water falls down as Falling_water, it stops flowing sideways completely.
+        
         return; 
     }
 
-    // 6. Lateral (Horizontal) Flow Logic
-    // This section executes only if down flow was blocked (water is sitting on a flat platform / solid ground)
     
-    // Determine the fullness level for adjacent blocks based on current state (Rule 4)
-    int lateralFullness;
+    int hFullness;
     if (fullness == 3) {
-        lateralFullness = 2; // Full out flows to Half
+       hFullness = 2; 
     } else if (fullness == 2) {
-        lateralFullness = 1; // Half out flows to Quarter
+       hFullness = 1; 
     } else {
-        lateralFullness = 1; // Quarter out flows continue to produce Quarter blocks
+       hFullness = 1; 
     }
 
-    // Propagate Flow to the Right
     int rightCol = col + 1;
     if (rightCol < map.getTiles().length) {
-        var rightTile = map.getTiles()[rightCol][row];
-        // Ensure destination isn't solid ground and hasn't already been processed by equal or greater water
-        if (rightTile == null || !rightTile.isSolid()) {
-            if (!(rightTile instanceof Water && ((Water) rightTile).getFullness() >= lateralFullness)) {
-                water(rightCol, row, map, lateralFullness);
-            }
-        }
+        water(rightCol, row, map, hFullness);
     }
 
-    // Propagate Flow to the Left
     int leftCol = col - 1;
     if (leftCol >= 0) {
-        var leftTile = map.getTiles()[leftCol][row];
-        // Ensure destination isn't solid ground and hasn't already been processed by equal or greater water
-        if (leftTile == null || !leftTile.isSolid()) {
-            if (!(leftTile instanceof Water && ((Water) leftTile).getFullness() >= lateralFullness)) {
-                water(leftCol, row, map, lateralFullness);
-            }
-        }
+        water(leftCol, row, map, hFullness);
     }
 }
 
