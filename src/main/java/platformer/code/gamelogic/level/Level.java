@@ -308,41 +308,84 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
      
    
     
-    int mapWidth = map.getWidth();
-    int mapHeight = map.getHeight();
-    
-    if (col < 0 || col >= mapWidth || row < 0 || row >= mapHeight) {
+    // Preconditions: col and row must be valid map coordinates where a flower was triggered.
+    // numSquaresToFill is the total target gas block budget (e.g., 20).
+    // placedThisRound is an empty list supplied to track the iterative expansion queue.
+    // Postconditions: The map is populated with up to numSquaresToFill gas tiles working outward 
+    // iteratively based on strict positional directions.
+
+    // Base validation check: exit immediately if there's no budget to fill
+    if (numSquaresToFill <= 0) {
         return;
     }
 
-   
-   
-    
-    
-    if (map.getTiles()[col][row] == null) {
-        Gas initialGas = new Gas(col, row, tileSize, tileset.getImage("GasOne"), this, 0);
-        map.addTile(col, row, initialGas);
-        placedThisRound.add(initialGas);
-        numSquaresToFill--;
-        
-  
-    }
+    // Place the original gas tile where the flower used to be
+    Gas initialGas = new Gas(col, row, tileSize, tileset.getImage("GasOne"), this, 0);
+    map.addTile(col, row, initialGas);
+    placedThisRound.add(initialGas);
+    numSquaresToFill--;
 
-    
+    // Strict expansion array mapped exactly to the 1-8 handwritten priorities in 1000004029.jpg:
+    // 1: Straight Up {0, -1} | 2: Up-Right {1, -1} | 3: Up-Left {-1, -1}
+    // 4: Straight Right {1, 0} | 5: Straight Left {-1, 0}
+    // 6: Straight Down {0, 1} | 7: Down-Right {1, 1} | 8: Down-Left {-1, 1}
     int[][] directions = {
-        {0, -1}, // Straight Up
-        {1, -1}, // Up-Right
-        {-1, -1}, // Up-Left
-        {1, 0}, // Right
-        {-1, 0}, // Left
-        {0, 1}, // Straight Down
-        {1, 1}, // Down-Right
-        {-1, 1} // Down-Left
+        {0, -1}, // 1. Straight Up
+        {1, -1}, // 2. Up-Right
+        {-1, -1}, // 3. Up-Left
+        {1, 0}, // 4. Straight Right
+        {-1, 0}, // 5. Straight Left
+        {0, 1}, // 6. Straight Down
+        {1, 1}, // 7. Down-Right
+        {-1, 1} // 8. Down-Left
     };
 
-   
-        
+    // Index pointer tracking our position inside our iterative "queue" (placedThisRound)
+    int head = 0;
 
+    // Iteratively loop through tiles placed this round and use them as new center expansion origins
+    while (head < placedThisRound.size() && numSquaresToFill > 0) {
+        Gas currentGas = placedThisRound.get(head);
+        
+        // Convert the gas tile's pixel coordinate values back into grid array indices
+        int currentCol = (int) currentGas.getX();
+        int currentRow = (int) currentGas.getY();
+
+        // Check all 8 neighboring directions around the current tile in exact priority order
+        for (int i = 0; i < directions.length; i++) {
+            // Early exit check if budget fills up mid-step
+            if (numSquaresToFill <= 0) {
+                return;
+            }
+
+            int targetCol = currentCol + directions[i][0];
+            int targetRow = currentRow + directions[i][1];
+
+            // 1. Array Bound Validation: prevent IndexOutOfBoundsExceptions on column-major array
+            if (targetCol >= 0 && targetCol < map.getTiles().length) {
+                if (targetRow >= 0 && targetRow < map.getTiles()[targetCol].length) {
+                    
+                    Tile targetTile = map.getTiles()[targetCol][targetRow];
+
+                    // 2. Tile Validation: Only expand if space is empty (null or non-solid passing tile)
+                    // and make sure we aren't overwriting an existing Gas tile
+                    if ((targetTile == null || !targetTile.isSolid()) && !(targetTile instanceof Gas)) {
+                        
+                        // Construct the new Gas block
+                        Gas newGas = new Gas(targetCol, targetRow, tileSize, tileset.getImage("GasOne"), this, 0);
+                        map.addTile(targetCol, targetRow, newGas);
+                        
+                        // Append to list so this tile can eventually act as an expansion origin too
+                        placedThisRound.add(newGas);
+                        numSquaresToFill--;
+                    }
+                }
+            }
+        }
+        
+        // Step forward in our array list queue to evaluate the next gas tile placed
+        head++;
+    }
            
                  
 }
