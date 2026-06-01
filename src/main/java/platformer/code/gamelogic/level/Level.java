@@ -297,14 +297,16 @@ private void water(int col, int row, Map map, int fullness) {
     }
 }
 // end of water 
+//
+// ##############################################################################################################
+// ##############################################################################################################
+//
+// start of gas
 	
-	//Adds gas tiles until the requisite number of squares are filled or there is no more room 
+//Adds gas tiles until the requisite number of squares are filled or there is no more room 
 private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<Gas> placedThisRound) {
      
-    // 1. Initial boundary and validation checks
-    if (map == null || numSquaresToFill <= 0) {
-        return;
-    }
+   
     
     int mapWidth = map.getWidth();
     int mapHeight = map.getHeight();
@@ -313,72 +315,44 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
         return;
     }
 
-    // 2. Queue for managing the iterative Breadth-First Search (BFS) expansion
-    // We reuse a helper class or point structure to keep track of grid locations
-    java.util.Queue<int[]> queue = new java.util.LinkedList<>();
+   
+   
     
-    // Check if the initial starting point can host the first gas tile
+    
     if (map.getTiles()[col][row] == null) {
         Gas initialGas = new Gas(col, row, tileSize, tileset.getImage("GasOne"), this, 0);
         map.addTile(col, row, initialGas);
         placedThisRound.add(initialGas);
         numSquaresToFill--;
         
-        // Add coordinates [col, row] to queue to spread from this block
-        queue.add(new int[]{col, row});
+  
     }
 
-    // Define the strict 8-directional expansion order specified by the project rules:
-    // Upwards (1, 2, 3), Sideways (4, 5), Downwards (6, 7, 8)
+    
     int[][] directions = {
-        {0, -1}, // 1: Straight Up
-        {1, -1}, // 2: Up-Right
-        {-1, -1}, // 3: Up-Left
-        {1, 0}, // 4: Right
-        {-1, 0}, // 5: Left
-        {0, 1}, // 6: Straight Down
-        {1, 1}, // 7: Down-Right
-        {-1, 1} // 8: Down-Left
+        {0, -1}, // Straight Up
+        {1, -1}, // Up-Right
+        {-1, -1}, // Up-Left
+        {1, 0}, // Right
+        {-1, 0}, // Left
+        {0, 1}, // Straight Down
+        {1, 1}, // Down-Right
+        {-1, 1} // Down-Left
     };
 
-    // 3. Iterative expansion loop
-    while (!queue.isEmpty() && numSquaresToFill > 0) {
-        int[] current = queue.poll();
-        int currCol = current[0];
-        int currRow = current[1];
+   
+        
 
-        // Evaluate all 8 potential expansion spots centered around the current gas tile
-        for (int[] dir : directions) {
-            // Stop immediately if the required quantity of gas tiles has been filled
-            if (numSquaresToFill <= 0) {
-                break;
-            }
+           
+                 
+}
 
-            int nextCol = currCol + dir[0];
-            int nextRow = currRow + dir[1];
-
-            // Ensure the targeted tile coordinates are strictly within map bounds
-            if (nextCol >= 0 && nextCol < mapWidth && nextRow >= 0 && nextRow < mapHeight) {
-                // Only place gas if the target grid cell is empty (null)
-                if (map.getTiles()[nextCol][nextRow] == null) {
-                    Gas newGas = new Gas(nextCol, nextRow, tileSize, tileset.getImage("GasOne"), this, 0);
-                    
-                    map.addTile(nextCol, nextRow, newGas);
-                    placedThisRound.add(newGas);
-                    numSquaresToFill--;
-
-                    // Add the newly created tile to the queue so it can spread down the line
-                    queue.add(new int[]{nextCol, nextRow});
-                }
-            }
-        }
-    }
-
-
-
-
-}	
-
+// end of gas
+//
+// ###############################################################################################################
+// ###############################################################################################################
+//
+// start of draw 
 public void draw(Graphics g) {
 	   	 g.translate((int) -camera.getX(), (int) -camera.getY());
 	   	 // Draw the map
