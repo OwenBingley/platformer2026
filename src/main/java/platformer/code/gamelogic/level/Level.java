@@ -119,6 +119,8 @@ public class Level {
 					tiles[x][y] = new Water(xPosition, yPosition, tileSize, tileset.getImage("Half_water"), this, 2);
 				else if (values[x][y] == 21)
 					tiles[x][y] = new Water(xPosition, yPosition, tileSize, tileset.getImage("Quarter_water"), this, 1);
+			   else if (values[x][y] == 22)
+				    tiles[x][y] = new SolidTile(xPosition, yPosition, tileSize, tileset.getImage("Thomp"), this);
 			}
 
 		}
@@ -336,8 +338,8 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
     while (head < placedThisRound.size() && numSquaresToFill > 0) {
         Gas currentGas = placedThisRound.get(head);
         
-        int currentCol = (int) currentGas.getX();
-        int currentRow = (int) currentGas.getY();
+        int currentCol = (int) currentGas.getCol();
+        int currentRow = (int) currentGas.getRow();
 
         for (int i = 0; i < directions.length; i++) {
             if (numSquaresToFill <= 0) {
