@@ -121,6 +121,9 @@ public class Level {
 					tiles[x][y] = new Water(xPosition, yPosition, tileSize, tileset.getImage("Quarter_water"), this, 1);
 			   else if (values[x][y] == 22)
 				    tiles[x][y] = new SolidTile(xPosition, yPosition, tileSize, tileset.getImage("Thomp"), this);
+			   else if(values[x][y]== 23)
+			     tiles[x][y] = new Flower(xPosition, yPosition, tileSize, tileset.getImage("jumpFlower"), this, 3);
+					flowers.add((Flower) tiles[x][y]);
 			}
 
 		}
