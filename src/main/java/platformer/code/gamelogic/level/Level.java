@@ -36,6 +36,11 @@ public class Level {
 	private ArrayList<Enemy> enemiesList = new ArrayList<>();
 	private ArrayList<Flower> flowers = new ArrayList<>();
 
+     //
+     private ArrayList<Water> waterList = new ArrayList<>();
+	 //
+
+
 	private List<PlayerDieListener> dieListeners = new ArrayList<>();
 	private List<PlayerWinListener> winListeners = new ArrayList<>();
 
@@ -121,9 +126,7 @@ public class Level {
 					tiles[x][y] = new Water(xPosition, yPosition, tileSize, tileset.getImage("Quarter_water"), this, 1);
 			   else if (values[x][y] == 22)
 				    tiles[x][y] = new SolidTile(xPosition, yPosition, tileSize, tileset.getImage("Thomp"), this);
-			   else if(values[x][y]== 23)
-			     tiles[x][y] = new Flower(xPosition, yPosition, tileSize, tileset.getImage("jumpFlower"), this, 3);
-					flowers.add((Flower) tiles[x][y]);
+			  
 			}
 
 		}
@@ -158,7 +161,8 @@ public class Level {
 		if (active) {
 			// Update the player
 			player.update(tslf);
-
+             
+		
 			// Player death
 			if (map.getFullHeight() + 100 < player.getY())
 				onPlayerDeath();
@@ -182,7 +186,16 @@ public class Level {
 					i--;
 				}
 			}
+			 ///////  slower
+			 for(Water w: waterList){
+				if(player.getHitbox().isIntersecting(w.getHitbox())) {
+					player.walkSpeed =100;
+				}else{
+						player.jumpPower = 400;
 
+				}
+			 }
+             ////// slower
 			// Update the enemies
 			for (int i = 0; i < enemies.length; i++) {
 				enemies[i].update(tslf);
@@ -249,6 +262,10 @@ private void water(int col, int row, Map map, int fullness) {
     int nextRow = row + 1;
     boolean canFlowDown = false;
 
+   ////// slower
+    waterList.add(w);
+  //////
+
   // Checks if the tile below is solid or not  
     if (nextRow < map.getTiles()[col].length) {
         Tile tileBelow = map.getTiles()[col][nextRow];
@@ -300,6 +317,11 @@ private void water(int col, int row, Map map, int fullness) {
     if (leftCol >= 0) {
         water(leftCol, row, map, hFullness);
     }
+  
+	   
+   
+
+
 }
 // end of water 
 //
