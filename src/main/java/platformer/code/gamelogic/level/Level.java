@@ -490,7 +490,7 @@ public void draw(Graphics g) {
          g.setColor(Color.RED);
 		 g.setFont(new Font("Arial", Font.BOLD, 30));
 		 if (gasDamageTimer != 0){
-		 g.drawString((System.currentTimeMillis() - gasDamageTimer)/1000 + "", (int) player.getX(), player.getY() +10);
+		 g.drawString((System.currentTimeMillis() - gasDamageTimer)/1000 + "", (int) player.getX(), (int) player.getY() +10);
 		}
 	   	// damage
 		
