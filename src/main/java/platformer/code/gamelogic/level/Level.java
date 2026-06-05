@@ -1,5 +1,7 @@
 package platformer.code.gamelogic.level;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,21 +43,23 @@ public class Level {
 	 // slower
      
     
-	 
-
 
      // damage
     private ArrayList<Gas> gasList = new ArrayList<>();
 	 // damage
 	private List<PlayerDieListener> dieListeners = new ArrayList<>();
 	private List<PlayerWinListener> winListeners = new ArrayList<>();
-
+    
 	private Mapdata mapdata;
 	private int width;
 	private int height;
 	private int tileSize;
 	private Tileset tileset;
 	public static float GRAVITY = 67;
+    // damage
+    private long gasDamageTimer = 0;
+	private long gasDamageInterval = 5; 
+	// damage
 
 	public Level(LevelData leveldata) {
 		this.leveldata = leveldata;
@@ -205,9 +209,15 @@ public class Level {
              ////// slower
 			
 			 ////// damage
-			  for(Gas curremtGas: gasList){
-				if(player.getHitbox().isIntersecting(curremtGas.getHitbox())) {
-					//player.health-=curremtGas.getIntensity();
+			  for(int d = 0; d < gasList.size(); d++) {
+				if(gasList.get(d).getHitbox().isIntersecting(player.getHitbox()) ) {
+				  if(gasDamageTimer == 0){
+					gasDamageTimer = System.currentTimeMillis();
+				  }
+				   else {
+                     if((System.currentTimeMillis() - gasDamageTimer / 1000) >= gasDamageInterval) {
+				     onPlayerDeath();
+					}
 				}
 			  }
 			
@@ -226,6 +236,8 @@ public class Level {
 			// Update the camera
 			camera.update(tslf);
 		}
+	}
+
 	}
 
 	// #############################################################################################################
@@ -274,7 +286,9 @@ private void water(int col, int row, Map map, int fullness) {
     Water w = new Water(col, row, tileSize, tileset.getImage(imageName), this, fullness);
     map.addTile(col, row, w);
 
-  
+  ////// slower
+    waterList.add(w);
+  ////// slower
 	// Trys yo flow downwards first
     int nextRow = row + 1;
     boolean canFlowDown = false;
@@ -333,9 +347,7 @@ private void water(int col, int row, Map map, int fullness) {
         water(leftCol, row, map, hFullness);
     }
   
-	////// slower
-    waterList.add(w);
-  ////// slower
+	
 	    
    
 
@@ -464,7 +476,7 @@ public void draw(Graphics g) {
 	   				 tile.draw(g);
 	   		 }
 	   	 }
-
+         
 
 	   	 // Draw the enemies
 	   	 for (int i = 0; i < enemies.length; i++) {
@@ -474,11 +486,15 @@ public void draw(Graphics g) {
 
 	   	 // Draw the player
 	   	 player.draw(g);
-
-
-
-
-	   	 // used for debugging
+         // damage
+         g.setColor(Color.RED);
+		 g.setFont(new Font("Arial", Font.BOLD, 30));
+		 if (gasDamageTimer != 0){
+		 g.drawString((System.currentTimeMillis() - gasDamageTimer)/1000 + "", (int) player.getX(), player.getY() +10);
+		}
+	   	// damage
+		
+		// used for debugging
 	   	 if (Camera.SHOW_CAMERA)
 	   		 camera.draw(g);
 	   	 g.translate((int) +camera.getX(), (int) +camera.getY());
