@@ -36,11 +36,17 @@ public class Level {
 	private ArrayList<Enemy> enemiesList = new ArrayList<>();
 	private ArrayList<Flower> flowers = new ArrayList<>();
 
-     //
+     // slower
      private ArrayList<Water> waterList = new ArrayList<>();
-	 //
+	 // slower
+     
+    
+	 
 
 
+     // damage
+    private ArrayList<Gas> gasList = new ArrayList<>();
+	 // damage
 	private List<PlayerDieListener> dieListeners = new ArrayList<>();
 	private List<PlayerWinListener> winListeners = new ArrayList<>();
 
@@ -190,13 +196,23 @@ public class Level {
 			 for(Water w: waterList){
 				if(player.getHitbox().isIntersecting(w.getHitbox())) {
 					player.walkSpeed =100;
+				    player.jumpPower = 1350;
 				}else{
-						player.jumpPower = 400;
-
-				}
+				player.walkSpeed = 400;
+                player.jumpPower = 1350;
+						}
 			 }
              ////// slower
-			// Update the enemies
+			
+			 ////// damage
+			  for(Gas curremtGas: gasList){
+				if(player.getHitbox().isIntersecting(curremtGas.getHitbox())) {
+					//player.health-=curremtGas.getIntensity();
+				}
+			  }
+			
+			////// damage
+			 // Update the enemies
 			for (int i = 0; i < enemies.length; i++) {
 				enemies[i].update(tslf);
 				if (player.getHitbox().isIntersecting(enemies[i].getHitbox())) {
@@ -258,13 +274,12 @@ private void water(int col, int row, Map map, int fullness) {
     Water w = new Water(col, row, tileSize, tileset.getImage(imageName), this, fullness);
     map.addTile(col, row, w);
 
-  // Trys yo flow downwards first
+  
+	// Trys yo flow downwards first
     int nextRow = row + 1;
     boolean canFlowDown = false;
 
-   ////// slower
-    waterList.add(w);
-  //////
+   
 
   // Checks if the tile below is solid or not  
     if (nextRow < map.getTiles()[col].length) {
@@ -282,7 +297,7 @@ private void water(int col, int row, Map map, int fullness) {
         int floorRow = nextRow + 1;
         int nextFullness = 0; 
         
-        
+       
        
 	    if (floorRow < map.getTiles()[col].length) {
             Tile floorTile = map.getTiles()[col][floorRow];
@@ -290,7 +305,7 @@ private void water(int col, int row, Map map, int fullness) {
                 nextFullness = 3; 
             }
         }
-
+      
        
         water(col, nextRow, map, nextFullness);
         
@@ -318,7 +333,10 @@ private void water(int col, int row, Map map, int fullness) {
         water(leftCol, row, map, hFullness);
     }
   
-	   
+	////// slower
+    waterList.add(w);
+  ////// slower
+	    
    
 
 
@@ -388,12 +406,16 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
                         numSquaresToFill--;
                     }
                 }
-            }
-        }
+           
+			}
+        // damage
+			gasList.add(currentGas); 
+		// damage
+	}
         
         head++;
     }
-           
+         
                  
 }
 
