@@ -58,7 +58,7 @@ public class Level {
 	public static float GRAVITY = 67;
     // damage
     private long gasDamageTimer = 0;
-	private long gasDamageInterval = 5; 
+	private long gasDamageInterval = 7; 
 	// damage
 
 	public Level(LevelData leveldata) {
@@ -207,20 +207,28 @@ public class Level {
 						}
 			 }
              ////// slower
-			
+		
+		boolean isInGas = false;
 			 ////// damage
 			  for(int d = 0; d < gasList.size(); d++) {
 				if(gasList.get(d).getHitbox().isIntersecting(player.getHitbox()) ) {
+					isInGas = true;
 				  if(gasDamageTimer == 0){
 					gasDamageTimer = System.currentTimeMillis();
 				  }
-				   else {
-                     if((System.currentTimeMillis() - gasDamageTimer / 1000) >= gasDamageInterval) {
+				  else {
+                     if((System.currentTimeMillis() - gasDamageTimer) / 1000 >= gasDamageInterval) {
 				     onPlayerDeath();
+					 
 					}
 				}
 			  }
-			
+			}
+			  if(!isInGas){
+               gasDamageTimer = 0;
+				//im out of gas
+			  }
+			 
 			////// damage
 			 // Update the enemies
 			for (int i = 0; i < enemies.length; i++) {
@@ -235,10 +243,11 @@ public class Level {
 
 			// Update the camera
 			camera.update(tslf);
+		
 		}
 	}
 
-	}
+	
 
 	// #############################################################################################################
 	// Your code goes here!
@@ -362,10 +371,6 @@ private void water(int col, int row, Map map, int fullness) {
 	
 //Adds gas tiles until the requisite number of squares are filled or there is no more room 
 private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<Gas> placedThisRound) {
-     
-   
-    
-   
 
     if (numSquaresToFill <= 0) {
         return;
@@ -392,7 +397,8 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
 
     while (head < placedThisRound.size() && numSquaresToFill > 0) {
         Gas currentGas = placedThisRound.get(head);
-        
+        gasList.add(currentGas); 
+		
         int currentCol = (int) currentGas.getCol();
         int currentRow = (int) currentGas.getRow();
 
@@ -413,7 +419,7 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
                         
                         Gas newGas = new Gas(targetCol, targetRow, tileSize, tileset.getImage("GasOne"), this, 0);
                         map.addTile(targetCol, targetRow, newGas);
-                        
+                        gasList.add(newGas);
                         placedThisRound.add(newGas);
                         numSquaresToFill--;
                     }
@@ -421,7 +427,7 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
            
 			}
         // damage
-			gasList.add(currentGas); 
+			
 		// damage
 	}
         
@@ -486,11 +492,12 @@ public void draw(Graphics g) {
 
 	   	 // Draw the player
 	   	 player.draw(g);
-         // damage
+         
+		 // damage
          g.setColor(Color.RED);
 		 g.setFont(new Font("Arial", Font.BOLD, 30));
-		 if (gasDamageTimer != 0){
-		 g.drawString((System.currentTimeMillis() - gasDamageTimer)/1000 + "", (int) player.getX(), (int) player.getY() +10);
+		if (gasDamageTimer != 0) {
+		g.drawString((System.currentTimeMillis() - gasDamageTimer)/1000 + "", (int) player.getX(), (int) player.getY() +10);
 		}
 	   	// damage
 		
