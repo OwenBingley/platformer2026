@@ -15,6 +15,23 @@ public class Player extends PhysicsObject{
 	public float jumpPower = 1350;
 
 	private boolean isJumping = false;
+    
+    // teleport
+	private boolean canTeleport = false;
+	public void enableTeleport(){
+	canTeleport = true;
+	}
+	public boolean canTeleport(){
+	return canTeleport;
+	}
+    public void disableTeleport(){
+		canTeleport = false;
+	}
+   public void teleport(float x, float y) {
+    position.x = x;
+    position.y = y;
+    hitbox.update();
+}
 
 	public Player(float x, float y, Level level) {
 	

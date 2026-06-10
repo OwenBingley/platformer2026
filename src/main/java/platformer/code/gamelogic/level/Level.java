@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
-
+import platformer.code.gameengine.input.MouseInputManager;
 import platformer.code.gameengine.PhysicsObject;
 import platformer.code.gameengine.graphics.Camera;
 import platformer.code.gameengine.loaders.Mapdata;
@@ -61,7 +61,7 @@ public class Level {
     private long gasDamageTimer = 0;
 	private long gasDamageInterval = 7; 
 	// damage
-
+    private boolean teleport = false;
 	public Level(LevelData leveldata) {
 		this.leveldata = leveldata;
 		mapdata = leveldata.getMapdata();
@@ -141,7 +141,10 @@ public class Level {
 					tiles[x][y] = new Water(xPosition, yPosition, tileSize, tileset.getImage("Quarter_water"), this, 1);
 			   else if (values[x][y] == 22)
 				    tiles[x][y] = new SolidTile(xPosition, yPosition, tileSize, tileset.getImage("Thomp"), this);
-			  
+			  else if (values[x][y] == 23) {
+					tiles[x][y] = new Flower(xPosition, yPosition, tileSize, tileset.getImage("teleportFlower"), this, 3);
+					flowers.add((Flower) tiles[x][y]);
+			}
 			}
 
 		}
@@ -176,7 +179,10 @@ public class Level {
 		if (active) {
 			// Update the player
 			player.update(tslf);
-             
+             if (MouseInputManager.isButtonDown(1) && player.canTeleport()) {
+
+    teleportPlayer((int) MouseInputManager.getMouseX(),(int) MouseInputManager.getMouseY());
+}
 		
 			// Player death
 			if (map.getFullHeight() + 100 < player.getY())
@@ -190,24 +196,30 @@ public class Level {
 			if (player.getCollisionMatrix()[PhysicsObject.RIG] instanceof Spikes)
 				onPlayerDeath();
 
-			for (int i = 0; i < flowers.size(); i++) {
-				if (flowers.get(i).getHitbox().isIntersecting(player.getHitbox())) {
-					if (flowers.get(i).getType() == 1)
-						water(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 3);
-					 else
-					addGas(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 20, new
-					 ArrayList<Gas>());
+                         for (int i = 0; i < flowers.size(); i++) { 
+                Flower currentFlower = flowers.get(i);
+                if (currentFlower.getHitbox().isIntersecting(player.getHitbox())) {
+                    
+                    if (currentFlower.getType() == 1) {
+                        water(currentFlower.getCol(), currentFlower.getRow(), map, 3);
+                    } else if (currentFlower.getType() == 2) {
+                        addGas(currentFlower.getCol(), currentFlower.getRow(), map, 20, new ArrayList<Gas>());
+                    } else if (currentFlower.getType() == 3) {
+                        player.enableTeleport(); 
+                    }
+                    
+					
 					flowers.remove(i);
-					i--;
-				}
-			}
+                    i--;
+                }
+            }
 			 ///////  slower
 			 
 			 boolean inWater = false;
 			 for(Water w: waterList){
 				if(player.getHitbox().isIntersecting(w.getHitbox())) {
 					inWater = true;
-					
+				}
 				}
                 if(inWater){
                  player.walkSpeed = 100;
@@ -217,7 +229,7 @@ public class Level {
 				    player.jumpPower = 1350;
 				}
 
-			 }
+			 
              ////// slower
 		
 		
@@ -244,7 +256,10 @@ public class Level {
 				//im out of gas
 			  }
 			 
-			////// damage
+			
+
+
+
 			 // Update the enemies
 			for (int i = 0; i < enemies.length; i++) {
 				enemies[i].update(tslf);
@@ -459,6 +474,62 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
 // ###############################################################################################################
 // ###############################################################################################################
 //
+
+
+public void teleportPlayer(int mouseX, int mouseY){
+
+if(!player.canTeleport()){
+	return;
+}
+
+float worldX = mouseX + camera.getX();
+float worldY = mouseY + camera.getY();
+
+int col = (int)(worldX / tileSize);
+int row = (int)(worldY / tileSize);
+
+if( col < 0 || col>= map.getWidth() || row < 0 || row >= map.getHeight()){
+	return;
+}
+
+Tile tile = map.getTiles()[col][row];
+
+
+if(tile == null || !tile.isSolid()){
+	player.teleport(col * tileSize, row * tileSize);
+}
+
+
+player.disableTeleport();
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // start of draw 
 public void draw(Graphics g) {
 	   	 g.translate((int) -camera.getX(), (int) -camera.getY());
@@ -510,6 +581,21 @@ public void draw(Graphics g) {
 	   	 // Draw the player
 	   	 player.draw(g);
          
+         if (player.canTeleport()) {
+          g.setColor(Color.GREEN); 
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+    
+    
+            int textX = (int) player.getX();
+              int textY = (int) player.getY() - 10; 
+    
+           g.drawString("Can Teleport", textX, textY);
+}
+
+
+
+
+
 		 // damage
          g.setColor(Color.RED);
 		 g.setFont(new Font("Arial", Font.BOLD, 30));
@@ -518,6 +604,9 @@ public void draw(Graphics g) {
 		}
 	   	// damage
 		
+        
+
+
 		// used for debugging
 	   	 if (Camera.SHOW_CAMERA)
 	   		 camera.draw(g);
