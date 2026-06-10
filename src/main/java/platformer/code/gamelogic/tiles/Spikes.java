@@ -35,7 +35,7 @@ public class Spikes extends Tile{
 			image = tileset.getImage("Spikes_leftwards");;
 			break;
 		case VERTICAL_RIGHTWARDS:
-			hitbox = new RectHitbox(x*size , y*size, 0, offsetX, size - offsetY, size - offsetX);
+			hitbox = new RectHitbox(x*size -2, y*size, 0, offsetX, size - offsetY, size - offsetX);
 			image = tileset.getImage("Spikes_rightwards");;
 			break;
 

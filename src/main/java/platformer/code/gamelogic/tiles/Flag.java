@@ -15,6 +15,12 @@ public class Flag extends Tile{
 	@Override
 	public void update(float tslf) {
 		if(hitbox.isIntersecting(Level.player.getHitbox())) level.onPlayerWin();
+	
+	     
+	
+	
 	}
 	
+
+
 }

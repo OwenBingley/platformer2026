@@ -47,7 +47,8 @@ public class Level {
      // damage
     private ArrayList<Gas> gasList = new ArrayList<>();
 	 // damage
-	private List<PlayerDieListener> dieListeners = new ArrayList<>();
+	
+	 private List<PlayerDieListener> dieListeners = new ArrayList<>();
 	private List<PlayerWinListener> winListeners = new ArrayList<>();
     
 	private Mapdata mapdata;
@@ -77,7 +78,11 @@ public class Level {
 	public void restartLevel() {
 		int[][] values = mapdata.getValues();
 		Tile[][] tiles = new Tile[width][height];
-
+        gasDamageTimer = 0;
+		gasList.clear();
+		waterList.clear();
+		flowers.clear();
+		enemiesList.clear();
 		for (int x = 0; x < width; x++) {
 			int xPosition = x;
 			for (int y = 0; y < height; y++) {
@@ -197,20 +202,29 @@ public class Level {
 				}
 			}
 			 ///////  slower
+			 
+			 boolean inWater = false;
 			 for(Water w: waterList){
 				if(player.getHitbox().isIntersecting(w.getHitbox())) {
-					player.walkSpeed =100;
+					inWater = true;
+					
+				}
+                if(inWater){
+                 player.walkSpeed = 100;
+				 player.jumpPower = 1350;
+				} else {
+					player.walkSpeed = 400;
 				    player.jumpPower = 1350;
-				}else{
-				player.walkSpeed = 400;
-                player.jumpPower = 1350;
-						}
+				}
+
 			 }
              ////// slower
 		
-		boolean isInGas = false;
-			 ////// damage
-			  for(int d = 0; d < gasList.size(); d++) {
+		
+			
+	 ////// damage
+			   boolean isInGas = false;
+	            for(int d = 0; d < gasList.size(); d++) {
 				if(gasList.get(d).getHitbox().isIntersecting(player.getHitbox()) ) {
 					isInGas = true;
 				  if(gasDamageTimer == 0){
@@ -218,8 +232,9 @@ public class Level {
 				  }
 				  else {
                      if((System.currentTimeMillis() - gasDamageTimer) / 1000 >= gasDamageInterval) {
+						
 				     onPlayerDeath();
-					 
+					 gasDamageTimer = 0;
 					}
 				}
 			  }
@@ -234,10 +249,12 @@ public class Level {
 			for (int i = 0; i < enemies.length; i++) {
 				enemies[i].update(tslf);
 				if (player.getHitbox().isIntersecting(enemies[i].getHitbox())) {
+			System.out.println("died due to enemy");
 					onPlayerDeath();
 				}
 			}
-
+             
+			
 			// Update the map
 			map.update(tslf);
 
@@ -398,7 +415,7 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
     while (head < placedThisRound.size() && numSquaresToFill > 0) {
         Gas currentGas = placedThisRound.get(head);
         gasList.add(currentGas); 
-		
+		 
         int currentCol = (int) currentGas.getCol();
         int currentRow = (int) currentGas.getRow();
 
