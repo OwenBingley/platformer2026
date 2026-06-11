@@ -499,8 +499,9 @@ if(tile == null || !tile.isSolid()){
 	player.teleport(col * tileSize, row * tileSize);
 }
 
-
+System.out.println(player.canTeleport());
 player.disableTeleport();
+System.out.println(player.canTeleport());
 
 
 }
