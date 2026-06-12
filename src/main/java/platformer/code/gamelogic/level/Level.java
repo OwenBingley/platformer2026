@@ -31,6 +31,7 @@ public class Level {
 	public static Player player;
 	private Camera camera;
 
+	private boolean lag = false;
 	private boolean active;
 	private boolean playerDead;
 	private boolean playerWin;
@@ -176,6 +177,10 @@ public class Level {
 	}
 
 	public void update(float tslf) {
+		if(lag){
+			tslf = 0;
+			lag = false;
+		}
 		if (active) {
 			// Update the player
 			player.update(tslf);
@@ -410,7 +415,7 @@ private void water(int col, int row, Map map, int fullness) {
 	
 //Adds gas tiles until the requisite number of squares are filled or there is no more room 
 private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<Gas> placedThisRound) {
-
+active = false;
     if (numSquaresToFill <= 0) {
         return;
     }
@@ -440,9 +445,11 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
 		 
         int currentCol = (int) currentGas.getCol();
         int currentRow = (int) currentGas.getRow();
-
+                    
+		
+		
         for (int i = 0; i < directions.length; i++) {
-            if (numSquaresToFill <= 0) {
+			if (numSquaresToFill <= 0) {
                 return;
             }
 
@@ -463,17 +470,15 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
                         numSquaresToFill--;
                     }
                 }
-           
 			}
-        // damage
-			
-		// damage
+                     active = true;
+
 	}
         
         head++;
     }
-         
-                 
+         active = true;
+          lag = true;       
 }
 
 // end of gas
