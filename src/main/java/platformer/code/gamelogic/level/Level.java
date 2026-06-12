@@ -191,15 +191,15 @@ public class Level {
 			  
 			if (player.getCollisionMatrix()[PhysicsObject.BOT] instanceof Spikes)
 				onPlayerDeath();
-			System.out.println("died from bot spike");
+			
 			if (player.getCollisionMatrix()[PhysicsObject.TOP] instanceof Spikes)
 				onPlayerDeath();
-			System.out.println("died from top spike");
+			
 			if (player.getCollisionMatrix()[PhysicsObject.LEF] instanceof Spikes)
 				onPlayerDeath();
-			System.out.println("died from left spike");
+			
 			if (player.getCollisionMatrix()[PhysicsObject.RIG] instanceof Spikes)
-				onPlayerDeath();  System.out.println("died from right spike");
+				onPlayerDeath();  
                 
                          for (int i = 0; i < flowers.size(); i++) { 
                 Flower currentFlower = flowers.get(i);
