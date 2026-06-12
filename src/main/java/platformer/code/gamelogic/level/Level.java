@@ -180,8 +180,9 @@ public class Level {
 			// Update the player
 			player.update(tslf);
              if (MouseInputManager.isButtonDown(1) && player.canTeleport()) {
-
-    teleportPlayer((int) MouseInputManager.getMouseX(),(int) MouseInputManager.getMouseY());
+    // teleport
+    teleportPlayer((int) MouseInputManager.getMouseX(),(int) MouseInputManager.getMouseY()); 
+     // teleport
 }
 		
 			// Player death
@@ -204,10 +205,11 @@ public class Level {
                         water(currentFlower.getCol(), currentFlower.getRow(), map, 3);
                     } else if (currentFlower.getType() == 2) {
                         addGas(currentFlower.getCol(), currentFlower.getRow(), map, 20, new ArrayList<Gas>());
-                    } else if (currentFlower.getType() == 3) {
+                    // teleport
+					} else if (currentFlower.getType() == 3) {
                         player.enableTeleport(); 
                     }
-                    
+                    // teleport
 					
 					flowers.remove(i);
                     i--;
@@ -246,6 +248,7 @@ public class Level {
                      if((System.currentTimeMillis() - gasDamageTimer) / 1000 >= gasDamageInterval) {
 						
 				     onPlayerDeath();
+					 System.out.println("died to gas");
 					 gasDamageTimer = 0;
 					}
 				}
@@ -474,7 +477,7 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
 // ###############################################################################################################
 // ###############################################################################################################
 //
-
+// start of teleport
 
 public void teleportPlayer(int mouseX, int mouseY){
 
@@ -506,29 +509,12 @@ System.out.println(player.canTeleport());
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// end of teleport
+//
+// ################################################################################################
+// ################################################################################################
+//
+//
 
 
 // start of draw 
@@ -581,7 +567,7 @@ public void draw(Graphics g) {
 
 	   	 // Draw the player
 	   	 player.draw(g);
-         
+         // teleport
          if (player.canTeleport()) {
           g.setColor(Color.GREEN); 
             g.setFont(new Font("Arial", Font.BOLD, 20));
@@ -592,7 +578,7 @@ public void draw(Graphics g) {
     
            g.drawString("Can Teleport", textX, textY);
 }
-
+         // teleport
 
 
 
